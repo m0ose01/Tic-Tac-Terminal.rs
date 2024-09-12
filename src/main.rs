@@ -1,5 +1,8 @@
-use std::fmt;
 use std::io;
+use crate::board::{
+    Square,
+    Board,
+};
 
 const DIMENSIONS: usize = 2;
 
@@ -63,67 +66,72 @@ fn main() {
     }
 }
 
-#[derive(Clone)]
-enum Square {
-    X,
-    O,
-    BLANK
-}
+mod board {
+    use std::fmt;
 
-struct Board {
-    size: usize,
-    board: Vec<Vec<Square>>
-}
-
-impl Board {
-    fn new(size: usize) -> Board {
-        Board {
-            size: size,
-            board: vec![vec![Square::BLANK; size]; size]
-        }
+    #[derive(Clone)]
+    pub enum Square {
+        X,
+        O,
+        BLANK
     }
 
-    fn place_piece(&mut self, piece: Square, position: (usize, usize)) -> Result<(), ()> {
-        let square = &mut self.board[position.0][position.1];
-        match square {
-            Square::BLANK => {
-                *square = piece;
-                Ok(())
-            },
-            _ => Err(())
-        }
+    pub struct Board {
+        pub size: usize,
+        board: Vec<Vec<Square>>
     }
-}
 
-impl fmt::Display for Board {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        let mut string = String::new();
-        string.push_str("-");
-        string.push_str(
-            &format!("{}\n", "----".repeat(self.size))
-        );
-        for row in &self.board {
-            string.push_str("|");
-            for square in row {
-                string.push_str(
-                    &format!(" {square} |")
-                )
+    impl Board {
+        pub fn new(size: usize) -> Board {
+            Board {
+                size: size,
+                board: vec![vec![Square::BLANK; size]; size]
             }
+        }
+
+        pub fn place_piece(&mut self, piece: Square, position: (usize, usize)) -> Result<(), ()> {
+            let square = &mut self.board[position.0][position.1];
+            match square {
+                Square::BLANK => {
+                    *square = piece;
+                    Ok(())
+                },
+                _ => Err(())
+            }
+        }
+    }
+
+    impl fmt::Display for Board {
+        fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+            let mut string = String::new();
+            string.push_str("-");
             string.push_str(
-                &format!("\n-{}\n", "----".repeat(self.size))
+                &format!("{}\n", "----".repeat(self.size))
+            );
+            for row in &self.board {
+                string.push_str("|");
+                for square in row {
+                    string.push_str(
+                        &format!(" {square} |")
+                    )
+                }
+                string.push_str(
+                    &format!("\n-{}\n", "----".repeat(self.size))
                 );
-        } 
-        write!(formatter, "{string}")
+            } 
+            write!(formatter, "{string}")
+        }
+    }
+
+    impl fmt::Display for Square {
+        fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+            let char = match &self {
+                Square::X => 'X',
+                Square::O => 'O',
+                Square::BLANK => ' '
+            };
+            write!(formatter, "{char}")
+        }
     }
 }
 
-impl fmt::Display for Square {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        let char = match &self {
-            Square::X => 'X',
-            Square::O => 'O',
-            Square::BLANK => ' '
-        };
-        write!(formatter, "{char}")
-    }
-}
