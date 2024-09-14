@@ -67,6 +67,10 @@ fn main() {
 }
 
 mod board {
+    use ndarray::{
+        Ix2,
+        Array,
+    };
     use std::fmt;
 
     #[derive(Clone)]
@@ -78,19 +82,19 @@ mod board {
 
     pub struct Board {
         pub size: usize,
-        board: Vec<Vec<Square>>
+        board: Array<Square, Ix2>
     }
 
     impl Board {
         pub fn new(size: usize) -> Board {
             Board {
                 size: size,
-                board: vec![vec![Square::BLANK; size]; size]
+                board: Array::<Square, Ix2>::from_elem((size, size), Square::BLANK),
             }
         }
 
         pub fn place_piece(&mut self, piece: Square, position: (usize, usize)) -> Result<(), ()> {
-            let square = &mut self.board[position.0][position.1];
+            let square = &mut self.board[(position.0, position.1)];
             match square {
                 Square::BLANK => {
                     *square = piece;
@@ -108,7 +112,7 @@ mod board {
             string.push_str(
                 &format!("{}\n", "----".repeat(self.size))
             );
-            for row in &self.board {
+            for row in self.board.rows() {
                 string.push_str("|");
                 for square in row {
                     string.push_str(
