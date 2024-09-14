@@ -19,7 +19,7 @@ fn main() {
         .read_line(&mut answer)
         .expect("Error reading user input.");
 
-        let answer = answer.trim().split_whitespace();
+        let answer = answer.split_whitespace();
         let answer: Vec<Result<usize, std::num::ParseIntError>> = answer.map(
             |number_str| number_str.parse()
         ).collect();
@@ -77,7 +77,7 @@ mod board {
     pub enum Square {
         X,
         O,
-        BLANK
+        Blank
     }
 
     pub struct Board {
@@ -88,15 +88,15 @@ mod board {
     impl Board {
         pub fn new(size: usize) -> Board {
             Board {
-                size: size,
-                board: Array::<Square, Ix2>::from_elem((size, size), Square::BLANK),
+                size,
+                board: Array::<Square, Ix2>::from_elem((size, size), Square::Blank),
             }
         }
 
         pub fn place_piece(&mut self, piece: Square, position: (usize, usize)) -> Result<(), ()> {
             let square = &mut self.board[(position.0, position.1)];
             match square {
-                Square::BLANK => {
+                Square::Blank => {
                     *square = piece;
                     Ok(())
                 },
@@ -108,12 +108,12 @@ mod board {
     impl fmt::Display for Board {
         fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
             let mut string = String::new();
-            string.push_str("-");
+            string.push('-');
             string.push_str(
                 &format!("{}\n", "----".repeat(self.size))
             );
             for row in self.board.rows() {
-                string.push_str("|");
+                string.push('|');
                 for square in row {
                     string.push_str(
                         &format!(" {square} |")
@@ -132,7 +132,7 @@ mod board {
             let char = match &self {
                 Square::X => 'X',
                 Square::O => 'O',
-                Square::BLANK => ' '
+                Square::Blank => ' '
             };
             write!(formatter, "{char}")
         }
