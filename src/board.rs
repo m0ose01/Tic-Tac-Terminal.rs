@@ -3,6 +3,7 @@ use ndarray::{
     Ix2,
     Array,
     ArrayView,
+    Axis,
 };
 use std::fmt;
 
@@ -62,6 +63,19 @@ impl Board {
             }
         }
 
+        let diagonal_count = 1 + (self.size - win_threshold) * 2;
+
+        for current_diag_offset in 0..diagonal_count {
+            let offset_a = (0, current_diag_offset);
+            let offset_b = (current_diag_offset, 0);
+            if check_lane(get_diagonal(self.board.view(), offset_a).expect("Invalid offset."), win_threshold) {
+                return BoardStatus::Win(winner);
+            }
+            if check_lane(get_diagonal(self.board.view(), offset_b).expect("Invalid offset."), win_threshold) {
+                return BoardStatus::Win(winner);
+            }
+        }
+
         if self.turn >= usize::pow(self.size, 2) {
             return BoardStatus::Draw;
         }
@@ -80,6 +94,33 @@ fn check_lane(lane: ArrayView<Square, Ix1>, win_threshold: usize) -> bool {
         }
     }
     return false
+}
+
+fn get_diagonal(array: ArrayView<Square, Ix2>, offset: (usize, usize)) -> Result<ArrayView<Square, Ix1>, (usize, usize)> {
+    if !((offset.0 == 0) | (offset.1 == 0)) {
+        return Err(offset);
+    }
+    let diagonal_length = array.shape()[0] - (offset.0 + offset.1);
+
+    // One offset must be zero, so this effectively "selects" the non-zero offset.
+    let offset_sum = offset.0 + offset.1;
+    Ok(
+        if offset.1 > offset.0 {
+            let horizontal_split = offset_sum;
+            let vertical_split = diagonal_length;
+            array
+                .split_at(Axis(0), horizontal_split).1
+                .split_at(Axis(1), vertical_split).0
+                .into_diag()
+        } else {
+            let horizontal_split = diagonal_length;
+            let vertical_split = offset_sum;
+            array
+                .split_at(Axis(0), horizontal_split).0
+                .split_at(Axis(1), vertical_split).1
+                .into_diag()
+        }
+    )
 }
 
 impl fmt::Display for Board {
