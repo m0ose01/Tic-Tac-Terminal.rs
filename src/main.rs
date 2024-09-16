@@ -4,11 +4,34 @@ use std::io;
 use crate::board::{
     Board,
 };
+use clap::Parser;
+
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    board_size: Option<usize>,
+    win_threshold: Option<usize>,
+}
 
 const DIMENSIONS: usize = 2;
 
 fn main() {
-    let mut board = Board::new(3);
+    let args = Args::parse();
+    let board_size: usize;
+    let win_threshold: usize;
+    if let Some(s) = args.board_size {
+        board_size = s;
+    } else {
+        board_size = 3;
+    }
+
+    if let Some(a) = args.win_threshold {
+        win_threshold = a;
+    } else {
+        win_threshold = 3;
+    }
+
+    let mut board = Board::new(board_size);
     'game_loop: loop {
 
         println!("{board}");
@@ -58,7 +81,6 @@ fn main() {
             }
         }
 
-        let win_threshold = board.size;
         match board.check_status(win_threshold) {
             board::BoardStatus::Win(player) => {
                 println!("{board}");
