@@ -64,15 +64,21 @@ impl Board {
         }
 
         let diagonal_count = 1 + (self.size - win_threshold) * 2;
+        let mut board = self.board.view();
 
-        for current_diag_offset in 0..diagonal_count {
-            let offset_a = (0, current_diag_offset);
-            let offset_b = (current_diag_offset, 0);
-            if check_lane(get_diagonal(self.board.view(), offset_a).expect("Invalid offset."), win_threshold) {
-                return BoardStatus::Win(winner);
+        for is_antidiagonal in [false, true] {
+            if is_antidiagonal {
+                board.invert_axis(Axis(0));
             }
-            if check_lane(get_diagonal(self.board.view(), offset_b).expect("Invalid offset."), win_threshold) {
-                return BoardStatus::Win(winner);
+            for current_diag_offset in 0..diagonal_count {
+                let offset_a = (0, current_diag_offset);
+                let offset_b = (current_diag_offset, 0);
+                if check_lane(get_diagonal(board, offset_a).expect("Invalid offset."), win_threshold) {
+                    return BoardStatus::Win(winner);
+                }
+                if check_lane(get_diagonal(board, offset_b).expect("Invalid offset."), win_threshold) {
+                    return BoardStatus::Win(winner);
+                }
             }
         }
 
