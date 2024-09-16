@@ -28,7 +28,7 @@ fn main() {
     if let Some(a) = args.win_threshold {
         win_threshold = a;
     } else {
-        win_threshold = 3;
+        win_threshold = board_size;
     }
 
     let mut board = Board::new(board_size);
