@@ -32,6 +32,10 @@ fn main() {
     }
 
     let mut board = Board::new(board_size);
+    start_game(&mut board, win_threshold);
+}
+
+fn start_game(board: &mut Board, win_threshold: usize) {
     'game_loop: loop {
 
         println!("{board}");
