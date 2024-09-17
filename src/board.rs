@@ -35,16 +35,20 @@ impl Board {
         }
     }
 
-    pub fn place_piece(&mut self, position: (usize, usize)) -> Result<(), ()> {
+    pub fn place_piece(&mut self, position: (usize, usize)) -> Result<(usize, usize), (usize, usize)> {
         let piece = if self.turn % 2 == 0 {Square::X} else {Square::O};
-        let square = &mut self.board[(position.0, position.1)];
+        let square = self.board.get_mut(position);
+        let square = match square {
+            Some(s) => s,
+            None => {return Err(position);}
+        };
         match square {
             Square::Blank => {
                 *square = piece;
                 self.turn += 1;
-                Ok(())
+                Ok(position)
             },
-            _ => Err(())
+            _ => Err(position)
         }
     }
 

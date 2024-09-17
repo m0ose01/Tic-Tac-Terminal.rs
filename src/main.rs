@@ -68,19 +68,12 @@ fn start_game(board: &mut Board, win_threshold: usize) {
             continue 'game_loop;
         }
 
-        if coords
-            .iter()
-            .any(|coord| *coord >= board.size) {
-            println!("Coordinate outside bounds of board.");
-            continue 'game_loop;
-        }
-
         let coords = (coords[0], coords[1]);
 
         match board.place_piece(coords) {
             Ok(_) => println!("Placed piece at {}, {}", coords.0, coords.1),
-            Err(_) => {
-                println!("Cannot place a piece there.");
+            Err(e) => {
+                println!("Cannot place a piece at ({}, {})", e.0 +1, e.1 + 1);
                 continue 'game_loop;
             }
         }
